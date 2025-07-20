@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thi thử Speaking</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: "Inter", sans-serif;
+            background-color: #f0f2f5;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #ffffff;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        .btn-primary {
+            background-color: #4f46e5;
+            color: white;
+            box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+        }
+        .btn-primary:hover {
+            background-color: #4338ca;
+            transform: translateY(-1px);
+        }
+        .btn-secondary {
+            background-color: #e0e7ff;
+            color: #4f46e5;
+            box-shadow: 0 2px 4px rgba(79, 70, 229, 0.1);
+        }
+        .btn-secondary:hover {
+            background-color: #c7d2fe;
+            transform: translateY(-1px);
+        }
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+            box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
+        }
+        .btn-danger:hover {
+            background-color: #dc2626;
+            transform: translateY(-1px);
+        }
+        .input-field {
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d5db;
+            border-radius: 0.5rem;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+        }
+        .question-card {
+            background-color: #f9fafb;
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        .error-message {
+            color: #ef4444;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+        }
+        .hidden {
+            display: none;
+        }
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+        }
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #4f46e5;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .evaluation-criteria {
+            background-color: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+        }
+        .evaluation-criteria h3 {
+            font-weight: 700;
+            color: #1e40af;
+            margin-bottom: 0.5rem;
+        }
+        .evaluation-criteria p {
+            color: #374151;
+            font-size: 0.95rem;
+            margin-bottom: 0.25rem;
+        }
+        .evaluation-criteria .overall-feedback {
+            margin-top: 1rem;
+            font-style: italic;
+            color: #047857;
+        }
+        .transcript-display {
+            background-color: #eef2ff;
+            border: 1px dashed #6366f1;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+            font-style: italic;
+            color: #4f46e5;
+            min-height: 60px; /* Ensure visibility even if empty */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .timer-countdown {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #ef4444;
+            margin-left: 1rem;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-4 min-h-screen flex items-center justify-center">
+    <div id="app" class="container">
+        <!-- Màn hình cấu hình test -->
+        <div id="config-screen" class="screen">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Cấu hình Bài kiểm tra Speaking</h1>
+
+            <div class="mb-4">
+                <label for="level-select" class="block text-gray-700 text-sm font-medium mb-2">Chọn trình độ dự kiến:</label>
+                <select id="level-select" class="input-field">
+                    <option value="all">Tất cả trình độ</option>
+                    <option value="A1">A1 (Sơ cấp)</option>
+                    <option value="A2">A2 (Sơ cấp trên)</option>
+                    <option value="B1">B1 (Trung cấp)</option>
+                    <option value="B2">B2 (Trung cấp trên)</option>
+                    <option value="C1">C1 (Nâng cao)</option>
+                </select>
+            </div>
+
+            <div class="mb-6">
+                <label for="num-questions-speaking" class="block text-gray-700 text-sm font-medium mb-2">Số lượng câu hỏi (1-10):</label>
+                <input type="number" id="num-questions-speaking" class="input-field" value="3" min="1" max="10">
+                <p class="text-gray-500 text-xs mt-1">Chọn số lượng câu hỏi từ 1 đến 10.</p>
+            </div>
+
+            <button id="start-config-btn" class="btn btn-primary w-full">Tiếp tục</button>
+        </div>
+
+        <!-- Màn hình nhập thông tin cá nhân -->
+        <div id="info-screen" class="screen hidden">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Nhập Thông tin Cá nhân</h1>
+
+            <div class="mb-4">
+                <label for="user-name" class="block text-gray-700 text-sm font-medium mb-2">Tên của bạn:</label>
+                <input type="text" id="user-name" class="input-field" placeholder="Nhập tên của bạn">
+                <p id="name-error" class="error-message hidden">Tên không được để trống.</p>
+            </div>
+
+            <div class="mb-4">
+                <label for="user-email" class="block text-gray-700 text-sm font-medium mb-2">Email:</label>
+                <input type="email" id="user-email" class="input-field" placeholder="Nhập email của bạn">
+                <p id="email-error" class="error-message hidden">Email không hợp lệ.</p>
+            </div>
+
+            <div class="flex justify-between gap-4 mt-6">
+                <button id="back-to-config-btn" class="btn btn-secondary w-1/2">Quay lại</button>
+                <button id="submit-info-btn" class="btn btn-primary w-1/2">Xác nhận thông tin</button>
+            </div>
+        </div>
+
+        <!-- Màn hình xác nhận thanh toán (miễn phí) -->
+        <div id="payment-screen" class="screen hidden">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Xác nhận Thanh toán</h1>
+            <div class="text-center mb-6">
+                <p class="text-lg text-gray-700 mb-2">Bài kiểm tra này hiện đang <span class="font-bold text-green-600">miễn phí</span>.</p>
+                <p class="text-gray-600">Vui lòng xác nhận để bắt đầu bài kiểm tra.</p>
+                <div class="mt-4">
+                    <!-- Placeholder for QR code or payment info if implemented later -->
+                    <img src="https://placehold.co/150x150/e0e7ff/4f46e5?text=QR+Code" alt="QR Code Placeholder" class="mx-auto rounded-lg shadow-md">
+                    <p class="text-sm text-gray-500 mt-2">Mã QR này chỉ mang tính chất minh họa.</p>
+                </div>
+            </div>
+            <div class="flex justify-between gap-4 mt-6">
+                <button id="back-to-info-btn" class="btn btn-secondary w-1/2">Quay lại</button>
+                <button id="confirm-payment-btn" class="btn btn-primary w-1/2">Bắt đầu Test</button>
+            </div>
+        </div>
+
+        <!-- Màn hình làm bài test -->
+        <div id="test-screen" class="screen hidden">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Bài kiểm tra Speaking</h1>
+            <div class="flex justify-between items-center mb-4">
+                <p class="text-lg font-medium text-gray-700">Câu hỏi <span id="current-question-num">1</span> / <span id="total-questions-num"></span></p>
+                <div class="text-lg font-medium text-gray-700">Trạng thái: <span id="status-display" class="text-blue-600">Sẵn sàng</span></div>
+                <div class="text-lg font-medium text-gray-700">Thời gian ghi âm: <span id="recording-timer" class="timer-countdown">30s</span></div>
+            </div>
+            <div id="question-display" class="question-card text-center mb-4">
+                <p class="text-xl font-semibold text-gray-800 mb-4" id="question-text"></p>
+                <button id="play-question-btn" class="btn btn-secondary"><i class="fas fa-volume-up"></i> Nghe câu hỏi</button>
+            </div>
+
+            <div class="flex justify-center gap-4 mb-4">
+                <button id="start-record-btn" class="btn btn-primary"><i class="fas fa-microphone"></i> Bắt đầu ghi âm</button>
+                <button id="stop-record-btn" class="btn btn-danger hidden"><i class="fas fa-stop"></i> Dừng ghi âm</button>
+            </div>
+            <div id="transcript-preview" class="transcript-display text-gray-600">
+                Bản ghi âm của bạn sẽ xuất hiện ở đây...
+            </div>
+            <p id="stt-error" class="error-message hidden text-center mt-2">Không thể nhận diện giọng nói. Vui lòng sử dụng Chrome.</p>
+            <p id="browser-support-warning" class="text-yellow-700 text-sm text-center mt-2 hidden">
+                Trình duyệt của bạn có thể không hỗ trợ đầy đủ tính năng ghi âm/chuyển giọng nói thành văn bản. Vui lòng sử dụng Chrome để có trải nghiệm tốt nhất.
+            </p>
+
+            <div class="flex justify-end mt-6">
+                <button id="next-question-btn" class="btn btn-primary" disabled>Câu tiếp theo</button>
+                <button id="submit-test-btn" class="btn btn-primary hidden">Nộp bài</button>
+            </div>
+        </div>
+
+        <!-- Màn hình kết quả -->
+        <div id="result-screen" class="screen hidden">
+            <h1 class="text-3xl font-bold text-gray-800 mb-6 text-center">Kết quả Bài kiểm tra Speaking</h1>
+            <div class="text-center mb-6">
+                <p class="text-xl text-gray-700 mb-2">Chào <span class="font-bold" id="result-user-name"></span>!</p>
+                <p class="text-lg text-gray-700">Dưới đây là phản hồi chi tiết về bài nói của bạn:</p>
+            </div>
+
+            <div id="evaluation-results-container" class="review-scroll-container">
+                <!-- Kết quả đánh giá từ AI sẽ được hiển thị ở đây -->
+            </div>
+
+            <button id="retake-test-btn" class="btn btn-primary w-full mt-6">Làm lại bài kiểm tra</button>
+        </div>
+
+        <!-- Custom Modal for Alerts -->
+        <div id="custom-modal" class="modal hidden">
+            <div class="modal-content">
+                <h3 id="modal-title" class="text-xl font-bold mb-4"></h3>
+                <p id="modal-message" class="text-gray-700 mb-6"></p>
+                <button id="modal-close-btn" class="btn btn-primary">Đóng</button>
+            </div>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div id="loading-overlay" class="loading-overlay hidden">
+            <div class="spinner mb-4"></div>
+            <p class="text-lg text-gray-700 font-semibold" id="loading-message">Đang xử lý...</p>
+        </div>
+    </div>
+
+    <script>
+        // --- Cấu hình API Key (Đã cập nhật từ tài khoản tuanvuluu92@gmail.com) ---
+        const apiKey = "AIzaSyDGHS-neze28q5la2AmoogFjnhUeMuFvmQ"; 
+
+        // --- Dữ liệu câu hỏi Speaking (Đã mở rộng) ---
+        const speakingQuestions = [
+            // A1 Level
+            { id: 1, level: "A1", question: "Tell me about your family.", expected_topic: "Family" },
+            { id: 2, level: "A1", question: "What do you do in your free time?", expected_topic: "Free time activities" },
+            { id: 3, level: "A1", question: "Describe your favorite food.", expected_topic: "Favorite food" },
+            { id: 4, level: "A1", question: "What is your daily routine?", expected_topic: "Daily routine" },
+            { id: 5, level: "A1", question: "Where do you live?", expected_topic: "Place of living" },
+            { id: 6, level: "A1", question: "What kind of movies do you like?", expected_topic: "Movie preferences" },
+            { id: 7, level: "A1", question: "Describe your best friend.", expected_topic: "Best friend description" },
+            { id: 8, level: "A1", question: "What is your favorite season?", expected_topic: "Favorite season" },
+            { id: 9, level: "A1", question: "Do you like to travel? Where do you want to go?", expected_topic: "Travel desires" },
+            { id: 10, level: "A1", question: "What subjects do you study?", expected_topic: "Study subjects" },
+
+            // A2 Level
+            { id: 11, level: "A2", question: "Describe your hometown or the place where you live.", expected_topic: "Hometown/Living Place Description" },
+            { id: 12, level: "A2", question: "What kind of music do you like, and why?", expected_topic: "Music Preference" },
+            { id: 13, level: "A2", question: "Tell me about a memorable trip you have taken.", expected_topic: "Memorable Trip" },
+            { id: 14, level: "A2", question: "What are your plans for the next weekend?", expected_topic: "Weekend plans" },
+            { id: 15, level: "A2", question: "Describe a typical day at your work/school.", expected_topic: "Work/School day" },
+            { id: 16, level: "A2", question: "What is your favorite type of weather? Why?", expected_topic: "Weather preference" },
+            { id: 17, level: "A2", question: "Do you prefer reading books or watching movies? Why?", expected_topic: "Reading vs Movies" },
+            { id: 18, level: "A2", question: "What are the advantages of learning English?", expected_topic: "Benefits of English" },
+            { id: 19, level: "A2", question: "Describe a person you admire.", expected_topic: "Admired person" },
+            { id: 20, level: "A2", question: "How do you usually celebrate your birthday?", expected_topic: "Birthday celebration" },
+
+            // B1 Level
+            { id: 21, level: "B1", question: "Discuss the importance of a healthy lifestyle.", expected_topic: "Healthy lifestyle importance" },
+            { id: 22, level: "B1", question: "What are some environmental problems in your country, and what can be done?", expected_topic: "Environmental problems" },
+            { id: 23, level: "B1", question: "Describe a challenging experience you've had and how you overcame it.", expected_topic: "Challenging experience" },
+            { id: 24, level: "B1", question: "How has technology changed the way people communicate?", expected_topic: "Technology and communication" },
+            { id: 25, level: "B1", question: "What are the benefits and drawbacks of living in a big city?", expected_topic: "City living pros and cons" },
+            { id: 26, level: "B1", question: "Talk about a skill you would like to learn and why.", expected_topic: "Desired skill" },
+            { id: 27, level: "B1", question: "What role do sports play in your life or in your society?", expected_topic: "Role of sports" },
+            { id: 28, level: "B1", question: "Describe a job you would find interesting and why.", expected_topic: "Interesting job" },
+            { id: 29, level: "B1", question: "How important is it to learn a foreign language?", expected_topic: "Importance of foreign language" },
+            { id: 30, level: "B1", question: "Discuss the advantages of online shopping compared to traditional shopping.", expected_topic: "Online vs traditional shopping" },
+
+            // B2 Level
+            { id: 31, level: "B2", question: "To what extent do you agree that social media has a negative impact on society?", expected_topic: "Social media impact" },
+            { id: 32, level: "B2", question: "Discuss the challenges and rewards of working in a team.", expected_topic: "Teamwork challenges/rewards" },
+            { id: 33, level: "B2", question: "What are the most significant changes you have observed in education over the past decade?", expected_topic: "Changes in education" },
+            { id: 34, level: "B2", question: "How important is it for governments to invest in renewable energy sources?", expected_topic: "Renewable energy investment" },
+            { id: 35, level: "B2", question: "Describe a time when you had to adapt to a new environment or situation.", expected_topic: "Adapting to new situations" },
+            { id: 36, level: "B2", question: "What are the ethical considerations surrounding artificial intelligence?", expected_topic: "AI ethical considerations" },
+            { id: 37, level: "B2", question: "Discuss the role of international cooperation in solving global problems.", expected_topic: "International cooperation" },
+            { id: 38, level: "B2", question: "How can individuals contribute to protecting endangered species?", expected_topic: "Endangered species protection" },
+            { id: 39, level: "B2", question: "What are the implications of a cashless society?", expected_topic: "Cashless society implications" },
+            { id: 40, level: "B2", question: "Discuss the impact of tourism on local cultures and economies.", expected_topic: "Tourism impact" },
+
+            // C1 Level
+            { id: 41, level: "C1", question: "To what extent can the arts contribute to social change?", expected_topic: "Arts and social change" },
+            { id: 42, level: "C1", question: "Discuss the complexities of achieving work-life balance in the modern world.", expected_topic: "Work-life balance complexities" },
+            { id: 43, level: "C1", question: "Analyze the role of critical thinking in academic and professional success.", expected_topic: "Critical thinking importance" },
+            { id: 44, level: "C1", question: "Evaluate the effectiveness of current global efforts to combat climate change.", expected_topic: "Climate change efforts effectiveness" },
+            { id: 45, level: "C1", question: "Explore the philosophical implications of advanced robotics and automation on human identity.", expected_topic: "Robotics and human identity" },
+            { id: 46, level: "C1", question: "Discuss the challenges of preserving cultural heritage in an increasingly globalized world.", expected_topic: "Cultural heritage preservation" },
+            { id: 47, level: "C1", question: "To what extent should governments regulate the content available on the internet?", expected_topic: "Internet content regulation" },
+            { id: 48, level: "C1", question: "Examine the psychological effects of prolonged isolation on individuals.", expected_topic: "Psychological effects of isolation" },
+            { id: 49, level: "C1", question: "Discuss the ethical dilemmas presented by genetic engineering.", expected_topic: "Genetic engineering ethics" },
+            { id: 50, level: "C1", question: "Analyze the concept of 'digital citizenship' and its importance in contemporary society.", expected_topic: "Digital citizenship" }
+        ];
+
+        // --- Biến toàn cục ---
+        let userName = '';
+        let userEmail = '';
+        let selectedLevel = 'all'; // Mặc định là tất cả trình độ
+        let numberOfQuestions = 3; // Mặc định là 3 câu hỏi
+        let testQuestions = []; // Các câu hỏi được chọn cho bài test hiện tại
+        let userAnswers = []; // Lưu trữ { question: string, transcript: string }
+        let recognition; // For SpeechRecognition API
+        let isRecording = false;
+        let recordingCountdown; // Variable for the countdown interval
+        const RECORDING_DURATION = 30; // 30 seconds for recording
+
+        // --- Lấy các phần tử DOM ---
+        const configScreen = document.getElementById('config-screen');
+        const infoScreen = document.getElementById('info-screen');
+        const paymentScreen = document.getElementById('payment-screen');
+        const testScreen = document.getElementById('test-screen');
+        const resultScreen = document.getElementById('result-screen');
+
+        const levelSelect = document.getElementById('level-select');
+        const numQuestionsSpeakingInput = document.getElementById('num-questions-speaking');
+        const userNameInput = document.getElementById('user-name');
+        const userEmailInput = document.getElementById('user-email');
+        const nameError = document.getElementById('name-error');
+        const emailError = document.getElementById('email-error');
+        const startConfigBtn = document.getElementById('start-config-btn');
+        const backToConfigBtn = document.getElementById('back-to-config-btn');
+        const submitInfoBtn = document.getElementById('submit-info-btn');
+        const backToInfoBtn = document.getElementById('back-to-info-btn');
+        const confirmPaymentBtn = document.getElementById('confirm-payment-btn');
+
+        const currentQuestionNumSpan = document.getElementById('current-question-num');
+        const totalQuestionsNumSpan = document.getElementById('total-questions-num');
+        const statusDisplay = document.getElementById('status-display');
+        const recordingTimerDisplay = document.getElementById('recording-timer');
+        const questionText = document.getElementById('question-text');
+        const playQuestionBtn = document.getElementById('play-question-btn');
+        const startRecordBtn = document.getElementById('start-record-btn');
+        const stopRecordBtn = document.getElementById('stop-record-btn');
+        const transcriptPreview = document.getElementById('transcript-preview');
+        const sttError = document.getElementById('stt-error');
+        const browserSupportWarning = document.getElementById('browser-support-warning');
+        const nextQuestionBtn = document.getElementById('next-question-btn');
+        const submitTestBtn = document.getElementById('submit-test-btn');
+
+        const resultUserName = document.getElementById('result-user-name');
+        const evaluationResultsContainer = document.getElementById('evaluation-results-container');
+        const retakeTestBtn = document.getElementById('retake-test-btn');
+
+        const customModal = document.getElementById('custom-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+        const modalCloseBtn = document.getElementById('modal-close-btn');
+        const loadingOverlay = document.getElementById('loading-overlay');
+        const loadingMessage = document.getElementById('loading-message');
+
+        // --- Hàm hiển thị/ẩn modal và loading overlay ---
+        function showModal(title, message, onCloseCallback = null) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            customModal.classList.remove('hidden');
+            modalCloseBtn.onclick = () => {
+                hideModal();
+                if (onCloseCallback) onCloseCallback();
+            };
+        }
+
+        function hideModal() {
+            customModal.classList.add('hidden');
+        }
+
+        function showLoading(message = "Đang xử lý...") {
+            loadingMessage.textContent = message;
+            loadingOverlay.classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            loadingOverlay.classList.add('hidden');
+        }
+
+        // --- Hàm chuyển đổi màn hình ---
+        function showScreen(screenId) {
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(screen => screen.classList.add('hidden'));
+            document.getElementById(screenId).classList.remove('hidden');
+        }
+
+        // Hàm xáo trộn mảng
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+
+        // --- Text-to-Speech (TTS) ---
+        function textToSpeech(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'en-US'; // Hoặc 'en-GB' tùy theo giọng bạn muốn
+                window.speechSynthesis.speak(utterance);
+            } else {
+                showModal("Lỗi TTS", "Trình duyệt của bạn không hỗ trợ Text-to-Speech.");
+            }
+        }
+
+        // --- Speech-to-Text (STT) và Ghi âm ---
+        function setupSpeechRecognition() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                browserSupportWarning.classList.remove('hidden');
+                startRecordBtn.disabled = true;
+                nextQuestionBtn.disabled = true;
+                submitTestBtn.disabled = true;
+                showModal("Lỗi trình duyệt", "Trình duyệt của bạn không hỗ trợ Web Speech API (SpeechRecognition). Vui lòng sử dụng Google Chrome để có trải nghiệm tốt nhất.");
+                return;
+            }
+
+            recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.continuous = false; // Stop after user stops speaking
+            recognition.interimResults = false; // Only return final results
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                statusDisplay.textContent = 'Đang ghi âm...';
+                statusDisplay.classList.remove('text-blue-600', 'text-yellow-600');
+                statusDisplay.classList.add('text-red-600');
+                transcriptPreview.textContent = 'Bạn đang nói...';
+                sttError.classList.add('hidden');
+                isRecording = true;
+                startRecordBtn.classList.add('hidden');
+                stopRecordBtn.classList.remove('hidden');
+                nextQuestionBtn.disabled = true; // Disable next/submit during recording
+                submitTestBtn.disabled = true;
+                startRecordingTimer(); // Start the 30s timer
+            };
+
+            recognition.onresult = (event) => {
+                const transcript = event.results[0][0].transcript;
+                transcriptPreview.textContent = `Bản ghi: "${transcript}"`;
+                userAnswers[currentQuestionIndex] = {
+                    question: testQuestions[currentQuestionIndex].question, // Use testQuestions for current set
+                    transcript: transcript
+                };
+                nextQuestionBtn.disabled = false; // Enable next/submit after transcription
+                if (currentQuestionIndex === testQuestions.length - 1) {
+                    submitTestBtn.disabled = false;
+                }
+                stopRecordingTimer(); // Stop timer when result is received
+                statusDisplay.textContent = 'Đã ghi âm xong';
+                statusDisplay.classList.remove('text-red-600', 'text-purple-600');
+                statusDisplay.classList.add('text-blue-600');
+                startRecordBtn.classList.remove('hidden');
+                stopRecordBtn.classList.add('hidden');
+            };
+
+            recognition.onerror = (event) => {
+                statusDisplay.textContent = 'Lỗi ghi âm';
+                statusDisplay.classList.remove('text-red-600', 'text-blue-600');
+                statusDisplay.classList.add('text-yellow-600');
+                sttError.classList.remove('hidden');
+                transcriptPreview.textContent = 'Không thể nhận diện giọng nói. Vui lòng thử lại.';
+                isRecording = false;
+                startRecordBtn.classList.remove('hidden');
+                stopRecordBtn.classList.add('hidden');
+                nextQuestionBtn.disabled = true; // Keep disabled if no valid answer
+                submitTestBtn.disabled = true;
+                console.error('Speech recognition error:', event.error);
+                showModal("Lỗi ghi âm", `Đã xảy ra lỗi khi ghi âm: ${event.error}. Vui lòng kiểm tra micro và cấp quyền.`);
+                stopRecordingTimer(); // Stop timer on error
+            };
+
+            recognition.onend = () => {
+                if (isRecording) { // If recording was still active (e.g., stopped by timer)
+                    statusDisplay.textContent = 'Đã dừng ghi âm tự động';
+                    statusDisplay.classList.remove('text-red-600', 'text-purple-600');
+                    statusDisplay.classList.add('text-blue-600');
+                    isRecording = false;
+                    startRecordBtn.classList.remove('hidden');
+                    stopRecordBtn.classList.add('hidden');
+                    // If no transcript was received (e.g., silence), ensure buttons are still disabled
+                    if (!userAnswers[currentQuestionIndex] || !userAnswers[currentQuestionIndex].transcript) {
+                        nextQuestionBtn.disabled = true;
+                        submitTestBtn.disabled = true;
+                    }
+                }
+            };
+        }
+
+        function startRecording() {
+            if (isRecording) return;
+            sttError.classList.add('hidden');
+            transcriptPreview.textContent = 'Bạn đang nói...';
+            try {
+                recognition.start();
+            } catch (e) {
+                console.error("Error starting speech recognition:", e);
+                showModal("Lỗi ghi âm", "Không thể bắt đầu ghi âm. Vui lòng kiểm tra micro và cấp quyền cho trình duyệt.");
+            }
+        }
+
+        function stopRecording() {
+            if (!isRecording) return;
+            recognition.stop();
+            isRecording = false; // Set to false immediately
+            stopRecordingTimer(); // Stop the timer
+            statusDisplay.textContent = 'Đang xử lý bản ghi...';
+            statusDisplay.classList.remove('text-red-600');
+            statusDisplay.classList.add('text-purple-600');
+            startRecordBtn.classList.remove('hidden');
+            stopRecordBtn.classList.add('hidden');
+        }
+
+        function startRecordingTimer() {
+            let timeLeft = RECORDING_DURATION;
+            recordingTimerDisplay.textContent = `${timeLeft}s`;
+            recordingCountdown = setInterval(() => {
+                timeLeft--;
+                recordingTimerDisplay.textContent = `${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(recordingCountdown);
+                    if (isRecording) { // Only stop recognition if it's still active
+                        recognition.stop();
+                        isRecording = false; // Set to false here as well
+                        statusDisplay.textContent = 'Hết giờ ghi âm. Đang xử lý...';
+                        statusDisplay.classList.remove('text-red-600');
+                        statusDisplay.classList.add('text-purple-600');
+                        startRecordBtn.classList.remove('hidden');
+                        stopRecordBtn.classList.add('hidden');
+                    }
+                }
+            }, 1000);
+        }
+
+        function stopRecordingTimer() {
+            clearInterval(recordingCountdown);
+            recordingTimerDisplay.textContent = `${RECORDING_DURATION}s`; // Reset display
+        }
+
+        // --- Logic hiển thị câu hỏi ---
+        function displayQuestion() {
+            const question = testQuestions[currentQuestionIndex];
+            currentQuestionNumSpan.textContent = currentQuestionIndex + 1;
+            totalQuestionsNumSpan.textContent = testQuestions.length;
+            questionText.textContent = question.question;
+            transcriptPreview.textContent = 'Bản ghi âm của bạn sẽ xuất hiện ở đây...';
+            sttError.classList.add('hidden');
+            statusDisplay.textContent = 'Sẵn sàng';
+            statusDisplay.classList.remove('text-red-600', 'text-yellow-600', 'text-purple-600');
+            statusDisplay.classList.add('text-blue-600');
+
+            // Reset buttons state
+            startRecordBtn.classList.remove('hidden');
+            stopRecordBtn.classList.add('hidden');
+            nextQuestionBtn.disabled = true;
+            submitTestBtn.classList.add('hidden'); // Hide submit until last question
+            stopRecordingTimer(); // Ensure timer is reset for new question
+
+            if (currentQuestionIndex === testQuestions.length - 1) {
+                nextQuestionBtn.classList.add('hidden');
+                submitTestBtn.classList.remove('hidden');
+            } else {
+                nextQuestionBtn.classList.remove('hidden');
+                submitTestBtn.classList.add('hidden');
+            }
+
+            // If user already answered this question, show their previous transcript and enable next/submit
+            if (userAnswers[currentQuestionIndex] && userAnswers[currentQuestionIndex].transcript) {
+                transcriptPreview.textContent = `Bản ghi: "${userAnswers[currentQuestionIndex].transcript}"`;
+                nextQuestionBtn.disabled = false;
+                if (currentQuestionIndex === testQuestions.length - 1) {
+                    submitTestBtn.disabled = false;
+                }
+            }
+        }
+
+        // --- Tạo bài test dựa trên cấu hình ---
+        function generateTest() {
+            let filteredQuestions = [];
+            if (selectedLevel === 'all') {
+                filteredQuestions = [...speakingQuestions];
+            } else {
+                filteredQuestions = speakingQuestions.filter(q => q.level === selectedLevel);
+            }
+
+            if (filteredQuestions.length < numberOfQuestions) {
+                showModal("Không đủ câu hỏi", `Chỉ có ${filteredQuestions.length} câu hỏi cho trình độ "${selectedLevel}". Vui lòng chọn số lượng câu hỏi ít hơn hoặc thay đổi trình độ.`);
+                return false; // Indicate failure to generate test
+            }
+
+            testQuestions = shuffleArray(filteredQuestions).slice(0, numberOfQuestions);
+            userAnswers = Array(testQuestions.length).fill(null); // Khởi tạo mảng đáp án người dùng
+            currentQuestionIndex = 0;
+            return true; // Indicate success
+        }
+
+        // --- Tích hợp AI Gemini để đánh giá ---
+        async function evaluateSpeaking(question, transcript) {
+            const prompt = `Bạn là một chuyên gia đánh giá khả năng nói tiếng Anh. Vui lòng đánh giá câu trả lời của học viên dựa trên câu hỏi và bản ghi âm sau. Đưa ra phản hồi chi tiết theo các tiêu chí sau và trả về dưới dạng JSON.
+
+            Câu hỏi: "${question}"
+            Bản ghi âm của học viên: "${transcript}"
+
+            Tiêu chí đánh giá (thang điểm 1-5, 5 là xuất sắc):
+            1.  **Fluency and Coherence (Độ trôi chảy và Mạch lạc):** Tốc độ, sự ngập ngừng, liên kết ý tưởng.
+            2.  **Lexical Resource (Vốn từ vựng):** Sự đa dạng, chính xác và phù hợp của từ vựng.
+            3.  **Grammatical Range and Accuracy (Độ đa dạng và Chính xác ngữ pháp):** Cấu trúc câu, số lỗi ngữ pháp.
+            4.  **Pronunciation (Phát âm):** Độ rõ ràng của âm, trọng âm, ngữ điệu, dễ hiểu.
+            5.  **Task Achievement (Hoàn thành nhiệm vụ):** Trả lời trực tiếp câu hỏi, cung cấp đủ thông tin.
+
+            Định dạng JSON mong muốn:
+            {
+              "question": "Câu hỏi gốc",
+              "user_transcript": "Bản ghi âm của học viên",
+              "evaluation": {
+                "fluency_coherence": { "score": 0, "feedback": "Phản hồi cụ thể" },
+                "lexical_resource": { "score": 0, "feedback": "Phản hồi cụ thể" },
+                "grammatical_range_accuracy": { "score": 0, "feedback": "Phản hồi cụ thể" },
+                "pronunciation": { "score": 0, "feedback": "Phản hồi cụ thể" },
+                "task_achievement": { "score": 0, "feedback": "Phản hồi cụ thể" }
+              },
+              "overall_feedback": "Phản hồi tổng thể về bài nói."
+            }
+            Nếu bản ghi âm trống hoặc không rõ ràng, hãy đưa ra phản hồi phù hợp về việc không thể đánh giá.
+            `;
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+
+            const payload = {
+                contents: chatHistory,
+                generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            "question": { "type": "STRING" },
+                            "user_transcript": { "type": "STRING" },
+                            "evaluation": {
+                                "type": "OBJECT",
+                                "properties": {
+                                    "fluency_coherence": {
+                                        "type": "OBJECT",
+                                        "properties": {
+                                            "score": { "type": "INTEGER" },
+                                            "feedback": { "type": "STRING" }
+                                        }
+                                    },
+                                    "lexical_resource": {
+                                        "type": "OBJECT",
+                                        "properties": {
+                                            "score": { "type": "INTEGER" },
+                                            "feedback": { "type": "STRING" }
+                                        }
+                                    },
+                                    "grammatical_range_accuracy": {
+                                        "type": "OBJECT",
+                                        "properties": {
+                                            "score": { "type": "INTEGER" },
+                                            "feedback": { "type": "STRING" }
+                                        }
+                                    },
+                                    "pronunciation": {
+                                        "type": "OBJECT",
+                                        "properties": {
+                                            "score": { "type": "INTEGER" },
+                                            "feedback": { "type": "STRING" }
+                                        }
+                                    },
+                                    "task_achievement": {
+                                        "type": "OBJECT",
+                                        "properties": {
+                                            "score": { "type": "INTEGER" },
+                                            "feedback": { "type": "STRING" }
+                                        }
+                                    }
+                                }
+                            },
+                            "overall_feedback": { "type": "STRING" }
+                        }
+                    }
+                }
+            };
+
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const jsonString = result.candidates[0].content.parts[0].text;
+                    // Attempt to parse the JSON string. If it fails, log error and return default.
+                    try {
+                        return JSON.parse(jsonString);
+                    } catch (parseError) {
+                        console.error("Error parsing JSON from Gemini API:", parseError, "Raw JSON string:", jsonString);
+                        return { overall_feedback: "Không thể nhận được phản hồi từ AI. Lỗi định dạng JSON." };
+                    }
+                } else {
+                    console.error("Unexpected API response structure or empty content:", result);
+                    // Return a default error message if API response is not as expected
+                    return { overall_feedback: "Không thể nhận được phản hồi từ AI. Vui lòng thử lại. (Lỗi cấu trúc phản hồi API)" };
+                }
+            } catch (error) {
+                console.error("Error calling Gemini API:", error);
+                // Return a default error message for network or other fetch errors
+                return { overall_feedback: "Đã xảy ra lỗi khi kết nối với AI. Vui lòng kiểm tra kết nối mạng hoặc API Key." };
+            }
+        }
+
+        // --- Logic xử lý kết quả và hiển thị ---
+        async function processAndDisplayResults() {
+            showLoading("Đang đánh giá bài nói của bạn với AI...");
+            evaluationResultsContainer.innerHTML = ''; // Clear previous results
+
+            for (let i = 0; i < userAnswers.length; i++) {
+                const answer = userAnswers[i];
+                const question = testQuestions[i].question; // Use testQuestions for current set
+                const transcript = answer && answer.transcript ? answer.transcript : "Không có bản ghi âm hoặc bản ghi trống.";
+
+                loadingMessage.textContent = `Đang đánh giá câu hỏi ${i + 1}/${userAnswers.length}...`;
+
+                const evaluation = await evaluateSpeaking(question, transcript);
+
+                let criteriaHtml = '';
+                if (evaluation.evaluation) {
+                    for (const criterion in evaluation.evaluation) {
+                        const data = evaluation.evaluation[criterion];
+                        let criterionName = '';
+                        switch (criterion) {
+                            case 'fluency_coherence': criterionName = 'Độ trôi chảy và Mạch lạc'; break;
+                            case 'lexical_resource': criterionName = 'Vốn từ vựng'; break;
+                            case 'grammatical_range_accuracy': criterionName = 'Độ đa dạng và Chính xác ngữ pháp'; break;
+                            case 'pronunciation': criterionName = 'Phát âm'; break;
+                            case 'task_achievement': criterionName = 'Hoàn thành nhiệm vụ'; break;
+                            default: criterionName = criterion;
+                        }
+                        criteriaHtml += `<p class="mb-1"><strong>${criterionName}:</strong> ${data.score}/5 - ${data.feedback}</p>`;
+                    }
+                } else {
+                    criteriaHtml = `<p class="text-red-600">Không thể lấy chi tiết đánh giá cho câu này.</p>`;
+                }
+
+
+                evaluationResultsContainer.innerHTML += `
+                    <div class="question-card mb-4">
+                        <p class="text-lg font-semibold text-gray-800 mb-2">Câu hỏi ${i + 1}: ${question}</p>
+                        <div class="transcript-display text-base mb-4">
+                            Bản ghi của bạn: "${transcript}"
+                        </div>
+                        <div class="evaluation-criteria">
+                            <h3 class="text-lg">Đánh giá của AI:</h3>
+                            ${criteriaHtml}
+                            <p class="overall-feedback mt-2"><strong>Phản hồi tổng thể:</strong> ${evaluation.overall_feedback || "Không có phản hồi tổng thể."}</p>
+                        </div>
+                    </div>
+                `;
+            }
+            hideLoading();
+            showScreen('result-screen');
+            resultUserName.textContent = userName;
+        }
+
+        // --- Event Listeners ---
+
+        // Màn hình cấu hình
+        startConfigBtn.addEventListener('click', () => {
+            selectedLevel = levelSelect.value;
+            numberOfQuestions = parseInt(numQuestionsSpeakingInput.value);
+
+            if (isNaN(numberOfQuestions) || numberOfQuestions < 1 || numberOfQuestions > 10) {
+                showModal("Lỗi cấu hình", "Số lượng câu hỏi phải là một số từ 1 đến 10.");
+                return;
+            }
+
+            // Generate test questions based on selected level and count
+            if (generateTest()) {
+                showScreen('info-screen');
+            }
+            // If generateTest returns false, it means a modal was already shown for insufficient questions.
+        });
+
+        // Màn hình thông tin cá nhân
+        backToConfigBtn.addEventListener('click', () => {
+            nameError.classList.add('hidden');
+            emailError.classList.add('hidden');
+            showScreen('config-screen');
+        });
+
+        submitInfoBtn.addEventListener('click', () => {
+            userName = userNameInput.value.trim();
+            userEmail = userEmailInput.value.trim();
+
+            let isValid = true;
+
+            if (userName === '') {
+                nameError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                nameError.classList.add('hidden');
+            }
+
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (userEmail === '' || !emailRegex.test(userEmail)) {
+                emailError.classList.remove('hidden');
+                isValid = false;
+            } else {
+                emailError.classList.add('hidden');
+            }
+
+            if (isValid) {
+                showScreen('payment-screen');
+            } else {
+                showModal("Lỗi thông tin", "Vui lòng kiểm tra lại thông tin cá nhân.");
+            }
+        });
+
+        // Màn hình thanh toán
+        backToInfoBtn.addEventListener('click', () => {
+            showScreen('info-screen');
+        });
+
+        confirmPaymentBtn.addEventListener('click', () => {
+            // No need to call generateTest again, it was called in startConfigBtn
+            showScreen('test-screen');
+            displayQuestion();
+            setupSpeechRecognition(); // Setup STT when test starts
+        });
+
+        // Màn hình làm bài test
+        playQuestionBtn.addEventListener('click', () => {
+            textToSpeech(testQuestions[currentQuestionIndex].question);
+        });
+
+        startRecordBtn.addEventListener('click', startRecording);
+        stopRecordBtn.addEventListener('click', stopRecording);
+
+        nextQuestionBtn.addEventListener('click', () => {
+            if (currentQuestionIndex < testQuestions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
+            }
+        });
+
+        submitTestBtn.addEventListener('click', () => {
+            showModal("Xác nhận nộp bài", "Bạn có chắc chắn muốn nộp bài không? Hệ thống sẽ tiến hành đánh giá.", () => {
+                processAndDisplayResults();
+            });
+        });
+
+        // Màn hình kết quả
+        retakeTestBtn.addEventListener('click', () => {
+            evaluationResultsContainer.innerHTML = '';
+            userNameInput.value = '';
+            userEmailInput.value = '';
+            numQuestionsSpeakingInput.value = 3; // Reset to default
+            levelSelect.value = 'all'; // Reset to default
+            showScreen('config-screen');
+        });
+
+        // Khởi tạo màn hình đầu tiên
+        showScreen('config-screen');
+    </script>
+</body>
+</html>
